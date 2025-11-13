@@ -219,7 +219,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              خصم يصل إلى 30%
+              30% خصم يصل الى
             </h2>
             <p className="text-xl mb-8">
               على جميع أنواع الكعك الفاخر لمدة محدودة
