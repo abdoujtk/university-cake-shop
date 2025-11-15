@@ -589,7 +589,7 @@ export default function Home() {
               الإلكتروني الجامعي
             </p>
             <p className="text-orange-300 font-medium">
-              صاحب الموق : عزالدين خولة/ 2001
+              صاحب الموقع : عزالدين خولة/ 2001
             </p>
           </div>
         </div>
