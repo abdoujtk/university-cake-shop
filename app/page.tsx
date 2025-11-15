@@ -588,6 +588,9 @@ export default function Home() {
               © 2024 حلويات الجلفة. جميع الحقوق محفوظة | مشروع التسويق
               الإلكتروني الجامعي
             </p>
+            <p className="text-orange-300 font-medium">
+              صاحب الموق : عزالدين خولة | سنة الميلاد: 2001
+            </p>
           </div>
         </div>
       </footer>
