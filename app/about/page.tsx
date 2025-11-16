@@ -89,7 +89,7 @@ export default function About() {
               </Link>
               <Link
                 href="/contact"
-                className="text-gray-600 hover:text-orange-600 transition-colors"
+                className="text-gray-600 hover:text-orange-600 transition-colors ml-6"
               >
                 اتصل بنا
               </Link>

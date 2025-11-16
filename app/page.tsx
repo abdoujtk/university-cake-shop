@@ -174,7 +174,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
+                  className="text-gray-700 hover:text-orange-600 font-medium transition-colors ml-6"
                 >
                   اتصل بنا
                 </Link>
