@@ -49,7 +49,7 @@ export default function Home() {
       name: "كعك عيد الميلاد",
       price: 4500,
       originalPrice: 5000,
-      image: "/images/birthday-cake.jpg",
+      image: "/images/birthday-cake1.jpg",
       category: "مناسبات",
       rating: 4.7,
       reviews: 28,
@@ -82,6 +82,19 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showCartPopup, setShowCartPopup] = useState(false);
+
+  // دالة لمعالجة أخطاء تحميل الصور
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+    productId: number
+  ) => {
+    const target = e.target as HTMLImageElement;
+    target.style.display = "none";
+    const fallback = document.getElementById(`fallback-${productId}`);
+    if (fallback) {
+      fallback.style.display = "flex";
+    }
+  };
 
   // تتبع حالة تسجيل الدخول
   useEffect(() => {
@@ -374,12 +387,30 @@ export default function Home() {
                 key={product.id}
                 className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 group"
               >
-                <div className="relative h-48 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center">
-                  <div className="text-center text-gray-400">
-                    <div className="text-4xl mb-2">🎂</div>
-                    <div className="text-sm">صورة {product.name}</div>
+                <div className="relative h-48 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center overflow-hidden">
+                  {/* الصورة الحقيقية */}
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    width={200}
+                    height={160}
+                    className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => handleImageError(e, product.id)}
+                  />
+
+                  {/* Fallback يظهر فقط إذا فشل تحميل الصورة */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50"
+                    style={{ display: "none" }}
+                    id={`fallback-${product.id}`}
+                  >
+                    <div className="text-center text-gray-400">
+                      <div className="text-4xl mb-2">🎂</div>
+                      <div className="text-sm">صورة {product.name}</div>
+                    </div>
                   </div>
 
+                  {/* العلامات */}
                   <div className="absolute top-3 left-3 flex flex-col space-y-2">
                     {product.tags.map((tag, index) => (
                       <span

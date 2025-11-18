@@ -5,6 +5,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { products, Product } from "../../data/products";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -13,120 +14,23 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
-  // بيانات المنتج (في تطبيق حقيقي سيتم جلبها من API)
-  const product = {
-    id: productId,
-    name: "كعك الشوكولاتة الفاخر",
-    price: 1200,
-    originalPrice: 1500,
-    images: [
-      "/images/chocolate-cake.jpg",
-      "/images/chocolate-cake-2.jpg",
-      "/images/chocolate-cake-3.jpg",
-    ],
-    category: "فاخر",
-    rating: 4.8,
-    reviews: 47,
-    description:
-      "شوكولاتة بلجيكية فاخرة مع توبينغ من الكراميل، مصنوعة بأفضل المكونات الطازجة والمستوردة. تتميز بنسيجها الناعم وطعمها الغني الذي يناسب جميع الأذواق.",
-    detailedDescription: `
-      <p>كعك الشوكولاتة الفاخر هو تحفة حلويات تجمع بين الأناقة والطعم الرائع. صنع هذا الكعك خصيصاً لعشاق الشوكولاتة الأصيلة.</p>
-      
-      <h4>المميزات:</h4>
-      <ul>
-        <li>شوكولاتة بلجيكية 70% كاكاو</li>
-        <li>كريمة طازجة 100%</li>
-        <li>توبينغ كراميل منزلي</li>
-        <li>خالي من المواد الحافظة</li>
-        <li>مناسب للتجميد</li>
-      </ul>
-      
-      <h4>طريقة التقديم:</h4>
-      <p>يقدم في درجة حرارة الغرفة مع كوب من القهوة أو الحليب.</p>
-    `,
-    ingredients: [
-      "شوكولاتة بلجيكية",
-      "كريمة طازجة",
-      "كراميل",
-      "زبدة",
-      "سكر",
-      "بيض",
-      "دقيق",
-      "فانيليا",
-    ],
-    nutrition: {
-      calories: 320,
-      fat: 15,
-      carbs: 45,
-      protein: 5,
-      sugar: 30,
-    },
-    tags: ["الأكثر مبيعاً", "جديد", "مميز"],
-    soldThisMonth: 23,
-    preparationTime: "15-20 دقيقة",
-    inStock: true,
-    isFeatured: true,
-    weight: "1 كجم",
-    dimensions: "20 × 20 × 8 سم",
-    shelfLife: "5 أيام في الثلاجة",
+  // دالة لمعالجة أخطاء تحميل الصور
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+    fallbackId: string
+  ) => {
+    const target = e.target as HTMLImageElement;
+    target.style.display = "none";
+    const fallback = document.getElementById(fallbackId);
+    if (fallback) {
+      fallback.style.display = "flex";
+    }
   };
 
-  const relatedProducts = [
-    {
-      id: 2,
-      name: "تشيز كيك بالتوت",
-      price: 1500,
-      image: "/images/cheesecake.jpg",
-      category: "مميز",
-    },
-    {
-      id: 4,
-      name: "ماكارون فرنسي",
-      price: 600,
-      image: "/images/macaron.jpg",
-      category: "تقليدي",
-    },
-    {
-      id: 6,
-      name: "كعك الجبن بالعسل",
-      price: 1300,
-      image: "/images/cheese-cake.jpg",
-      category: "تقليدي",
-    },
-  ];
+  // البحث عن المنتج بناءً على الـ ID
+  const product = products.find((p) => p.id === productId);
 
-  const reviews = [
-    {
-      id: 1,
-      user: "أحمد محمد",
-      rating: 5,
-      comment: "أطيب كعك جربته في حياتي! النكهة رائعة والجودة ممتازة.",
-      date: "2024-01-15",
-    },
-    {
-      id: 2,
-      user: "فاطمة الزهراء",
-      rating: 4,
-      comment: "جيد جداً ولكن أتمنى لو كان الحجم أكبر قليلاً.",
-      date: "2024-01-10",
-    },
-    {
-      id: 3,
-      user: "محمد أمين",
-      rating: 5,
-      comment: "شوكولاتة بلجيكية حقيقية، أنصح الجميع بتجربته.",
-      date: "2024-01-08",
-    },
-  ];
-
-  const addToCart = () => {
-    alert(`تم إضافة ${quantity} من ${product.name} إلى السلة!`);
-  };
-
-  const addToWishlist = () => {
-    alert(`تم إضافة ${product.name} إلى المفضلة!`);
-  };
-
+  // إذا لم يتم العثور على المنتج
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-50 font-arabic flex items-center justify-center">
@@ -162,6 +66,43 @@ export default function ProductDetail() {
       </div>
     );
   }
+
+  // منتجات ذات صلة (تستثني المنتج الحالي)
+  const relatedProducts = products
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .slice(0, 3);
+
+  const reviews = [
+    {
+      id: 1,
+      user: "أحمد محمد",
+      rating: product.rating >= 4 ? 5 : 4,
+      comment: "أطيب كعك جربته في حياتي! النكهة رائعة والجودة ممتازة.",
+      date: "2024-01-15",
+    },
+    {
+      id: 2,
+      user: "فاطمة الزهراء",
+      rating: 4,
+      comment: "جيد جداً ولكن أتمنى لو كان الحجم أكبر قليلاً.",
+      date: "2024-01-10",
+    },
+    {
+      id: 3,
+      user: "محمد أمين",
+      rating: 5,
+      comment: "شوكولاتة بلجيكية حقيقية، أنصح الجميع بتجربته.",
+      date: "2024-01-08",
+    },
+  ];
+
+  const addToCart = () => {
+    alert(`تم إضافة ${quantity} من ${product.name} إلى السلة!`);
+  };
+
+  const addToWishlist = () => {
+    alert(`تم إضافة ${product.name} إلى المفضلة!`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-arabic">
@@ -238,10 +179,29 @@ export default function ProductDetail() {
           <div>
             {/* الصورة الرئيسية */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-4">
-              <div className="h-96 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <div className="text-6xl mb-4">🎂</div>
-                  <div className="text-lg">صورة {product.name}</div>
+              <div className="h-96 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center relative overflow-hidden">
+                {/* الصورة الحقيقية */}
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  width={400}
+                  height={384}
+                  className="object-contain w-full h-full"
+                  onError={(e) =>
+                    handleImageError(e, `main-image-fallback-${product.id}`)
+                  }
+                />
+
+                {/* Fallback يظهر فقط إذا فشل تحميل الصورة */}
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50"
+                  style={{ display: "none" }}
+                  id={`main-image-fallback-${product.id}`}
+                >
+                  <div className="text-center text-gray-400">
+                    <div className="text-6xl mb-4">🎂</div>
+                    <div className="text-lg">صورة {product.name}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -258,8 +218,30 @@ export default function ProductDetail() {
                       : "border-transparent hover:border-orange-300"
                   }`}
                 >
-                  <div className="h-24 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center">
-                    <div className="text-2xl">🎂</div>
+                  <div className="h-24 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center relative overflow-hidden">
+                    {/* الصورة المصغرة */}
+                    <Image
+                      src={image}
+                      alt={`${product.name} - صورة ${index + 1}`}
+                      width={100}
+                      height={96}
+                      className="object-contain w-full h-full"
+                      onError={(e) =>
+                        handleImageError(
+                          e,
+                          `thumb-fallback-${product.id}-${index}`
+                        )
+                      }
+                    />
+
+                    {/* Fallback للصورة المصغرة */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50"
+                      style={{ display: "none" }}
+                      id={`thumb-fallback-${product.id}-${index}`}
+                    >
+                      <div className="text-2xl">🎂</div>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -570,10 +552,34 @@ export default function ProductDetail() {
                 href={`/products/${relatedProduct.id}`}
               >
                 <div className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
-                  <div className="h-48 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <div className="text-4xl mb-2">🎂</div>
-                      <div className="text-sm">صورة {relatedProduct.name}</div>
+                  <div className="h-48 bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center relative overflow-hidden">
+                    {/* الصورة الحقيقية */}
+                    <Image
+                      src={relatedProduct.images[0]}
+                      alt={relatedProduct.name}
+                      width={200}
+                      height={192}
+                      className="object-cover w-full h-full"
+                      onError={(e) =>
+                        handleImageError(
+                          e,
+                          `related-fallback-${relatedProduct.id}`
+                        )
+                      }
+                    />
+
+                    {/* Fallback */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50"
+                      style={{ display: "none" }}
+                      id={`related-fallback-${relatedProduct.id}`}
+                    >
+                      <div className="text-center text-gray-400">
+                        <div className="text-4xl mb-2">🎂</div>
+                        <div className="text-sm">
+                          صورة {relatedProduct.name}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="p-4">
